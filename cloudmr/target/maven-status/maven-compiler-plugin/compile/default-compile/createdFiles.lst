@@ -1,6 +1,6 @@
 it/unipi/Job2.class
 it/unipi/Job1.class
-it/unipi/Job1$PairReducer.class
-it/unipi/Job1$PairMapper.class
+it/unipi/Job1$Mapper1.class
 it/unipi/Job3.class
+it/unipi/Job1$Reducer1.class
 it/unipi/MainDriver.class
