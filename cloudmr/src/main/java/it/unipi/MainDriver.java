@@ -27,6 +27,8 @@ public class MainDriver {
         // Collegamento classi interne Mapper1 e Reducer1
         job1.setMapperClass(Job1.Mapper1.class);
         job1.setReducerClass(Job1.Reducer1.class);
+
+        // job1.setNumReduceTasks(3); VALUTARE NUMERO DI REDUCER
         
         job1.setOutputKeyClass(Text.class);
         job1.setOutputValueClass(Text.class);
@@ -35,7 +37,11 @@ public class MainDriver {
         FileInputFormat.addInputPath(job1, inputPath);
         FileOutputFormat.setOutputPath(job1, outputPath);
 
+        //job.setInputFormatClass(TextInputFormat.class);
+        // job.setOutputFormatClass(TextOutputFormat.class);
+
         // Esecuzione
         System.exit(job1.waitForCompletion(true) ? 0 : 1);
+
     }
 }
