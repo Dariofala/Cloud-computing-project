@@ -19,6 +19,7 @@ public class MainDriver {
             super(DoubleWritable.class, true);
         }
 
+        @SuppressWarnings("rawtypes") // Questa riga dice a Java di ignorare i 2 warning
         @Override
         public int compare(WritableComparable a, WritableComparable b) {
             DoubleWritable d1 = (DoubleWritable) a;

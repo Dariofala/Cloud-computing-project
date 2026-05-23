@@ -31,7 +31,7 @@ public class Job1 {
 
             if (ruolo.equals("actor") || ruolo.equals("actress") || ruolo.equals("director")) {
                 outKey.set(nomeFilm);
-                outValue.set(ruolo + ":" + nomePersona + ":" + votoStr);
+                outValue.set(ruolo + ";;;" + nomePersona + ";;;" + votoStr);
                 context.write(outKey, outValue);
             }
         }
@@ -51,7 +51,7 @@ public class Job1 {
             String votoFilm = "";
 
             for (Text val : values) {
-                String[] parts = val.toString().split(":");
+                String[] parts = val.toString().split(";;;");
                 String ruolo = parts[0];
                 String nome = parts[1];
                 votoFilm = parts[2];
@@ -60,6 +60,10 @@ public class Job1 {
                 } else {
                     actors.add(nome);
                 }
+            }
+
+            if(directors.size() > 50 || actors.size() > 500){
+                return; // Skip di titoli con troppi collaboratori per non bloccare il reducer
             }
 
             // Prodotto Cartesiano
