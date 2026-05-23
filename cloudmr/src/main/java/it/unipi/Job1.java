@@ -60,6 +60,7 @@ public class Job1 {
             // Prodotto Cartesiano
             for (String director : directors) {
                 for (String actor : actors) {
+                    if (director.equals(actor)) continue;
                     outKey.set(director + "_" + actor);
                     outValue.set(votoFilm);
                     context.write(outKey, outValue);
