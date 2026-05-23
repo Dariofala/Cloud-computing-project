@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Job1 {
-    public static class PairMapper extends Mapper<LongWritable, Text, Text, Text> {
+    public static class Mapper1 extends Mapper<LongWritable, Text, Text, Text> {
         private Text outKey = new Text();
         private Text outValue = new Text();
 
@@ -35,7 +35,7 @@ public class Job1 {
         }
     }
 
-    public static class PairReducer extends Reducer<Text, Text, Text, Text> {
+    public static class Reducer1 extends Reducer<Text, Text, Text, Text> {
         private Text outKey = new Text();
         private Text outValue = new Text();
 
