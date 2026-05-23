@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Job1 {
+
+    // 1 MAPPER
     public static class Mapper1 extends Mapper<LongWritable, Text, Text, Text> {
         private Text outKey = new Text();
         private Text outValue = new Text();
@@ -35,6 +37,9 @@ public class Job1 {
         }
     }
 
+    // 2 PARTITIONER - SHUFFLE & SORT
+
+    // 3 REDUCER
     public static class Reducer1 extends Reducer<Text, Text, Text, Text> {
         private Text outKey = new Text();
         private Text outValue = new Text();
