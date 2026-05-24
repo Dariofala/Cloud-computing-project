@@ -75,8 +75,8 @@ public class Job2 {
                 count += val.getCount();
             }
 
-            // Scarta le coppie con meno di 3 collaborazioni
-            if (count >= 5) {
+            // Scarta le coppie con meno di 10 collaborazioni
+            if (count >= 10) {
                 double media = sum / count;
                 outValue.set(String.valueOf(media));
                 context.write(key, outValue);
