@@ -17,20 +17,33 @@ public class Job1 {
         @Override
         protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             String[] columns = value.toString().split("\t");
-            if (columns.length < 4) return;
+            if (columns.length < 5) return;
 
-            String nomeFilm = columns[0].trim();
+            String idFilm = columns[0].trim();
             String nomePersona = columns[1].trim();
             String ruolo = columns[2].trim();
             String votoStr = columns[3].trim();
+            String numVotiStr = columns[4].trim();
 
-            if (nomeFilm.isEmpty() || nomeFilm.equals("NaN") || nomeFilm.equals("\\N")) return;
+            if (idFilm.isEmpty() || idFilm.equals("NaN") || idFilm.equals("\\N")) return;
             if (nomePersona.isEmpty() || nomePersona.equals("NaN")|| nomePersona.equals("\\N")) return;
             if (ruolo.isEmpty() || ruolo.equals("NaN")|| ruolo.equals("\\N")) return;
             if (votoStr.isEmpty() || votoStr.equals("NaN")|| votoStr.equals("\\N")) return;
+            if (numVotiStr.isEmpty() || numVotiStr.equals("NaN")|| numVotiStr.equals("\\N")) return;
+
+            // Filtro per numero di voti
+            try {
+                int numVoti = (int) Double.parseDouble(numVotiStr);
+                if (numVoti < 500){
+                    return; 
+                }
+            } catch (NumberFormatException e) {
+                return; 
+            }
+            
 
             if (ruolo.equals("actor") || ruolo.equals("actress") || ruolo.equals("director")) {
-                outKey.set(nomeFilm);
+                outKey.set(idFilm);
                 outValue.set(ruolo + ";;;" + nomePersona + ";;;" + votoStr);
                 context.write(outKey, outValue);
             }

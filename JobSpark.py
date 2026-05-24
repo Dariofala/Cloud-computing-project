@@ -5,19 +5,30 @@ def mapper1(line):
 
     # Equivalente al Mapper 1: Estrae e pulisce i campi
     parts = line.split('\t')
-    if len(parts) < 4:
+    if len(parts) < 5:
         return None
     
     title = parts[0].strip()
     name = parts[1].strip()
     role = parts[2].strip()
     rating_str = parts[3].strip()
+    votes_str = parts[4].strip()
 
     # Controlli di validità
     if not title or title in ("NaN", "\\N"): return None
     if not name or name in ("NaN", "\\N"): return None
     if not role or role in ("NaN", "\\N"): return None
     if not rating_str or rating_str in ("NaN", "\\N"): return None
+    if not votes_str or votes_str in ("NaN", "\\N"): return None
+
+    try:
+        num_votes = int(float(votes_str))
+    except ValueError:
+        return None
+
+    # Filtro film con almeno 500 voti
+    if num_votes < 500:
+        return None
 
     if role in ["actor", "actress", "director"]:
         # Chiave: TitoloFilm, Valore: (Ruolo, Nome, Voto)
@@ -100,11 +111,11 @@ def main():
     # ----
     # EQUIVALENTE JOB 3
     # Ordinamento: ascending=False per ordine decrescente 
-    sorted_rdd = final_averages_rdd.sortBy(lambda x: x[1], ascending=False)
+    sorted_rdd = final_averages_rdd.repartition(1).sortBy(lambda x: x[1], ascending=False)
 
     # Output finale come stringa e lo salviamo su HDFS
     formatted_output = sorted_rdd.map(lambda x: f"{x[1]}\t{x[0]}")
-    formatted_output.repartition(1).saveAsTextFile(output_path)
+    formatted_output.saveAsTextFile(output_path)
 
     sc.stop()
 
