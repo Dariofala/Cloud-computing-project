@@ -1,0 +1,143 @@
+openapi: 3.0.0
+info:
+  title: Montalbano Group Endpoints
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /job:
+    post:
+      summary: Launch a job
+      operationId: job_post
+      parameters:
+      - name: framework
+        in: query
+        description: choose a framework
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - MapReduce
+          - Spark
+      - name: inputFile
+        in: query
+        description: choose an inputFile
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - 3.6GB (full)
+          - 1.5GB
+          - 0.5GB
+      responses:
+        "202":
+          description: Job accepted and started in background
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_202"
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /jobs:
+    get:
+      summary: Get the status of all recent jobs
+      operationId: jobs_get
+      responses:
+        "200":
+          description: Returns a list containing the status of recent jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/inline_response_200"
+                x-content-type: application/json
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /jobs/{jobId}:
+    get:
+      summary: Get the status and results of a specific job
+      operationId: jobs_job_id_get
+      parameters:
+      - name: jobId
+        in: path
+        description: Unique ID of the job
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Returns the status and, if completed, the results of the job"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_1"
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components:
+  schemas:
+    inline_response_202:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Job accepted and started in background
+        jobId:
+          type: string
+          example: job_uuid_12345
+      example:
+        jobId: job_uuid_12345
+        message: Job accepted and started in background
+    inline_response_200:
+      type: object
+      properties:
+        jobId1:
+          type: string
+          example: "01"
+        status1:
+          type: string
+          example: COMPLETED
+          enum:
+          - RUNNING
+          - COMPLETED
+          - FAILED
+        jobId2:
+          type: string
+          example: "01"
+        status2:
+          type: string
+          example: RUNNING
+          enum:
+          - RUNNING
+          - COMPLETED
+          - FAILED
+      example:
+        jobId2: "01"
+        jobId1: "01"
+        status1: COMPLETED
+        status2: RUNNING
+    inline_response_200_1:
+      type: object
+      properties:
+        jobId:
+          type: string
+        status:
+          type: string
+          enum:
+          - RUNNING
+          - COMPLETED
+          - FAILED
+        results:
+          type: array
+          items:
+            type: string
+      example:
+        jobId: jobId
+        results:
+        - results
+        - results
+        status: RUNNING
+
