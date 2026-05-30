@@ -1,5 +1,5 @@
 import os
-
+import time
 import connexion
 import six
 import threading
@@ -31,6 +31,8 @@ def esegui_job_background(job_id, framework, input_file_key):
         # 1. Copiamo le variabili d'ambiente attuali del container
         my_env = os.environ.copy()
 
+        start_time = time.time()
+
         if framework == "MapReduce":
             comando = [
                 "hadoop", "jar",
@@ -38,14 +40,14 @@ def esegui_job_background(job_id, framework, input_file_key):
                 "it.unipi.MainDriver",
                 input_path, output_dir
             ]
-            print(f"[Thread-{job_id}] Avvio {framework} su {input_path}...")
+            print(f"[Thread-{job_id}] Start {framework} on {input_path}...")
             # Per MapReduce passiamo l'ambiente pulito standard
             subprocess.run(comando, check=True)
 
         elif framework == "Spark":
             comando = [
                 "spark-submit", "--master", "yarn",
-                "--conf", "spark.eventLog.enabled=false",
+                "--conf", "spark.eventLog.enabled=fail",
                 "/home/hadoop/ProgettoCloud/JobSpark.py",
                 input_path, output_dir
             ]
@@ -56,7 +58,7 @@ def esegui_job_background(job_id, framework, input_file_key):
             # Executors sulle VM: usa il percorso che YARN si aspetta
             my_env["PYSPARK_PYTHON"] = "/usr/bin/python3.10" 
 
-            print(f"[Thread-{job_id}] Avvio {framework} su {input_path}...")
+            print(f"[Thread-{job_id}] Start {framework} on {input_path}...")
             # Per Spark passiamo a subprocess l'ambiente modificato (env=my_env)
             subprocess.run(comando, env=my_env, check=True)
             
@@ -64,13 +66,17 @@ def esegui_job_background(job_id, framework, input_file_key):
             tracked_jobs[str(job_id)]["status"] = "FAILED"
             return
 
+        end_time = time.time()
+        execution_time = round(end_time - start_time, 2)
+
         # Aggiorna lo stato al termine dell'esecuzione
         tracked_jobs[str(job_id)]["status"] = "COMPLETED"
-        print(f"[Thread-{job_id}] Job completato con successo!")
+        tracked_jobs[str(job_id)]["executionTime"] = execution_time
+        print(f"[Thread-{job_id}] Job completed successfully!")
 
     except subprocess.CalledProcessError as e:
         tracked_jobs[str(job_id)]["status"] = "FAILED"
-        print(f"[Thread-{job_id}] Errore durante l'esecuzione: {e}")
+        print(f"[Thread-{job_id}] Error during execution: {e}")
 
 # ENDPOINTS REST
 def job_post(framework=None, input_file=None):  # noqa: E501
@@ -85,7 +91,8 @@ def job_post(framework=None, input_file=None):  # noqa: E501
     tracked_jobs[job_id] = {
         "jobId": job_id,
         "status": "RUNNING",
-        "framework": framework
+        "framework": framework,
+        "executionTime": None
     }
     
     # Avvio del calcolo asincrono
@@ -109,10 +116,14 @@ def jobs_job_id_get(job_id):  # noqa: E501
     
     # Verifica esistenza
     if job_id not in tracked_jobs:
-        return "Job non trovato", 404
+        return "Job not found", 404
         
     # Crea una copia per non modificare il dizionario originale
     job_info = {"jobId": tracked_jobs[job_id]["jobId"], "status": tracked_jobs[job_id]["status"]}
+
+    # Se il job ha calcolato il tempo, lo aggiungiamo alla risposta
+    if tracked_jobs[job_id].get("executionTime") is not None:
+        job_info["executionTime"] = tracked_jobs[job_id]["executionTime"]
     
     # Se ha finito, vai a leggere da HDFS
     if job_info["status"] == "COMPLETED":
@@ -128,6 +139,6 @@ def jobs_job_id_get(job_id):  # noqa: E501
             
         except subprocess.CalledProcessError:
             job_info["status"] = "FAILED"
-            job_info["results"] = ["Errore: Impossibile leggere il file di output da HDFS"]
+            job_info["results"] = ["Error: Can't read output file from HDFS"]
             
     return job_info, 200

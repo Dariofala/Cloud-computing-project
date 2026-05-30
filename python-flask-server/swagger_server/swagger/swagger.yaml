@@ -130,12 +130,15 @@ components:
           - RUNNING
           - COMPLETED
           - FAILED
+        executionTime:
+          type: number
         results:
           type: array
           items:
             type: string
       example:
         jobId: jobId
+        executionTime: 0
         results:
         - results
         - results
