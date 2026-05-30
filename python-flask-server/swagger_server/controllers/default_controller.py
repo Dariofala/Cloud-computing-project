@@ -25,7 +25,7 @@ def esegui_job_background(job_id, framework, input_file_key):
     Esegue fisicamente il comando sul cluster in background.
     """
     output_dir = f"output_job_{job_id}"
-    input_path = HDFS_PATHS.get(input_file_key, "datasetCompletoProgetto")
+    input_path = HDFS_PATHS.get(input_file_key, "datasetCompleto")
 
     try:
         # 1. Copiamo le variabili d'ambiente attuali del container
@@ -47,7 +47,7 @@ def esegui_job_background(job_id, framework, input_file_key):
         elif framework == "Spark":
             comando = [
                 "spark-submit", "--master", "yarn",
-                "--conf", "spark.eventLog.enabled=fail",
+                "--conf", "spark.eventLog.enabled=false",
                 "/home/hadoop/ProgettoCloud/JobSpark.py",
                 input_path, output_dir
             ]
