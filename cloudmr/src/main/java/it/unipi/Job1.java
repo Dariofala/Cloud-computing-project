@@ -34,7 +34,7 @@ public class Job1 {
             // Filtro per numero di voti
             try {
                 int numVoti = (int) Double.parseDouble(numVotiStr);
-                if (numVoti < 500){
+                if (numVoti < 100000){
                     return; 
                 }
             } catch (NumberFormatException e) {

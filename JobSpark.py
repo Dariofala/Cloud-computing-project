@@ -26,8 +26,8 @@ def mapper1(line):
     except ValueError:
         return None
 
-    # Filtro film con almeno 500 voti
-    if num_votes < 500:
+    # Filtro film con almeno 100000 voti
+    if num_votes < 100000:
         return None
 
     if role in ["actor", "actress", "director"]:
@@ -100,11 +100,11 @@ def main():
 
     def filter_and_avg(record):
         pair, (sum_ratings, count) = record
-        if count >= 10:
+        if count >= 3:
             return (pair, sum_ratings / count)
         return None
     
-    # Equivalente Reducer 2: filtra coppie con almeno 10 collaborazioni
+    # Equivalente Reducer 2: filtra coppie con almeno 3 collaborazioni
     final_averages_rdd = aggregated_pairs.map(filter_and_avg).filter(lambda x: x is not None)
 
 
