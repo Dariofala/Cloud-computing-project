@@ -119,7 +119,11 @@ def jobs_job_id_get(job_id):  # noqa: E501
         return "Job not found", 404
         
     # Crea una copia per non modificare il dizionario originale
-    job_info = {"jobId": tracked_jobs[job_id]["jobId"], "status": tracked_jobs[job_id]["status"]}
+    job_info = {
+        "jobId": tracked_jobs[job_id]["jobId"], 
+        "status": tracked_jobs[job_id]["status"],
+        "framework": tracked_jobs[job_id].get("framework", "Unknown") 
+    }
 
     # Se il job ha calcolato il tempo, lo aggiungiamo alla risposta
     if tracked_jobs[job_id].get("executionTime") is not None:
@@ -131,11 +135,33 @@ def jobs_job_id_get(job_id):  # noqa: E501
         try:
             # Esegue cat del file di output e ne cattura il testo
             hdfs_output = subprocess.check_output([
-		"hadoop", "fs", "-cat", f"{output_dir}/part-*"])
+                "hadoop", "fs", "-cat", f"{output_dir}/part-*"
+            ])
             
-            # Decodifica, divide in righe e prende solo la Top 100
-            lines = hdfs_output.decode('utf-8').strip().split('\n')[:100]
-            job_info["results"] = lines
+            raw_lines = hdfs_output.decode('utf-8').strip().split('\n')[:100]
+            
+            formatted_results = []
+            for line in raw_lines:
+                if not line:
+                    continue
+                
+                parts = line.split('\t')
+
+                # Controllo di sicurezza
+                if len(parts) >= 2:
+                    try:
+                        rating = float(parts[0])
+                        pair = parts[1]
+                        formatted_line = f"{rating:.2f} - {pair}"
+                        formatted_results.append(formatted_line)
+                    except ValueError:
+                        # Se la conversione in float fallisce, stampa la riga con un trattino
+                        formatted_results.append(line.replace('\t', ' - '))
+                else:
+                    # Se non c'è tab, stampa la riga così com'è
+                    formatted_results.append(line)
+
+            job_info["results"] = formatted_results
             
         except subprocess.CalledProcessError:
             job_info["status"] = "FAILED"

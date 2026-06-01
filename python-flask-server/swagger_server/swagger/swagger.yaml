@@ -130,6 +130,8 @@ components:
           - RUNNING
           - COMPLETED
           - FAILED
+        framework: 
+          type: string
         executionTime:
           type: number
         results:
@@ -138,6 +140,7 @@ components:
             type: string
       example:
         jobId: jobId
+        framework: "Spark"
         executionTime: 0
         results:
         - results
