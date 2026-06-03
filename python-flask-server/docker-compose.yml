@@ -1,0 +1,19 @@
+services:
+  rest-server:
+    build: .
+    container_name: rest-server
+    network_mode: "host"
+    restart: always
+    environment:
+      - HADOOP_USER_NAME=hadoop
+      - HADOOP_HOME=/opt/hadoop
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+      - SPARK_HOME=/opt/spark
+      - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+      - PATH=/opt/hadoop/bin:/opt/spark/bin:/usr/local/bin:/usr/bin:/bin
+    volumes:
+      - /opt/hadoop:/opt/hadoop:ro
+      - /opt/spark:/opt/spark:ro
+      - /usr/lib/jvm/java-8-openjdk-amd64:/usr/lib/jvm/java-8-openjdk-amd64:ro
+      - /home/hadoop/ProgettoCloud:/home/hadoop/ProgettoCloud:ro
+      - /etc/hosts:/etc/hosts:ro
