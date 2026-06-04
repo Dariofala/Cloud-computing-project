@@ -78,7 +78,7 @@ def elaborazione_locale(input_path, output_path):
     # --- CALCOLO METRICHE ---
     end_wall = time.perf_counter()
 
-    execution_time = end_wall - start_wall          # tempo reale (s)
+    execution_time = end_wall - start_wall # tempo reale (s)
 
     print("\n" + "="*40)
     print("      METRICHE DI ESECUZIONE LOCALE      ")

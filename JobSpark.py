@@ -74,7 +74,7 @@ def main():
     conf = SparkConf().setAppName("JobSpark")
     sc = SparkContext(conf=conf)
 
-    # 1. Lettura Input (Creazione RDD base) 
+    # Lettura Input (Creazione RDD base) 
     lines_rdd = sc.textFile(input_path)
 
 

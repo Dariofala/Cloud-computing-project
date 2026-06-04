@@ -28,7 +28,6 @@ def esegui_job_background(job_id, framework, input_file_key):
     input_path = HDFS_PATHS.get(input_file_key, "datasetCompleto")
 
     try:
-        # 1. Copiamo le variabili d'ambiente attuali del container
         my_env = os.environ.copy()
 
         start_time = time.time()
@@ -52,7 +51,6 @@ def esegui_job_background(job_id, framework, input_file_key):
                 input_path, output_dir
             ]
             
-            # 2. FIX SPARK: Specifichiamo i percorsi Python esatti
             # Driver nel container: usa il comando base di sistema
             my_env["PYSPARK_DRIVER_PYTHON"] = "python3" 
             # Executors sulle VM: usa il percorso che YARN si aspetta
